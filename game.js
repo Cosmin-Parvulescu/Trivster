@@ -1,6 +1,14 @@
-var realtime = function(http) {
-    var io = require('socket.io')(http);
+var Game = function() {
+    this.io = null;
+};
 
+Game.prototype.initServer = function(server) {
+    this.io = require('socket.io')(server);
+
+    setUpEvents(this.io);
+};
+
+var setUpEvents = function(io) {
     io.on('connection', function(socket) {
         socket.on('join', function(room) {
             socket.join(room, function(err) {
@@ -23,4 +31,4 @@ var realtime = function(http) {
     });
 };
 
-module.exports = realtime;
+module.exports = Game;

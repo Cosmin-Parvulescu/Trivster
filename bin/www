@@ -1,6 +1,12 @@
 #!/usr/bin/env node
 
 /**
+ * Tha game object
+ */
+
+var Game = require('../game');
+
+/**
  * Module dependencies.
  */
 
@@ -25,7 +31,8 @@ var server = http.createServer(app);
  * Configure socket events
  */
 
- var realtime = require('../realtime')(server);
+ var game = new Game();
+ game.initServer(server);
 
 /**
  * Listen on provided port, on all network interfaces.
