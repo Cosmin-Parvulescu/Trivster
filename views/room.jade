@@ -1,0 +1,13 @@
+extends layout
+
+block content
+    script(type='text/javascript').
+        var socket = io();
+
+        socket.on('connect', function() {
+            socket.emit('join', '#{ room }');
+        });
+
+        socket.on('update', function(data) {
+            alert(data.message);
+        });
