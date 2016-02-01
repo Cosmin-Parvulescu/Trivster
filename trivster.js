@@ -1,5 +1,6 @@
-var Trivster = exports.Trivster = function(questionSource, hintTickCb) {
+var Trivster = exports.Trivster = function(questionSource, questionTickCb, hintTickCb) {
     this._questionSource = questionSource;
+    this._questionTickCb = questionTickCb;
     this._hintTickCb = hintTickCb;
 
     this._currentRound = 0;
@@ -19,7 +20,9 @@ Trivster.prototype._handleRoundEnd = function() {
 Trivster.prototype._handleRoundStart = function() {
     this._currentRound++;
     this._currentRoundTick = 0;
+
     this._currentQuestion = this._questionSource.getRandomQuestion();
+    this._questionTickCb(this._currentQuestion);
 
     var self = this;
     this._timer = setInterval(function() {
@@ -32,7 +35,7 @@ Trivster.prototype._handleRoundStart = function() {
 
         self._hintTickCb(hint);
         self._currentRoundTick = (self._currentRoundTick + 1) % (self._ticksPerRound + 1);
-    }, 1000);
+    }, 10000);
 };
 
 Trivster.prototype.startGame = function() {
