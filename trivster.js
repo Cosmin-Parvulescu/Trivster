@@ -17,6 +17,7 @@ Trivster.prototype._handleRoundEnd = function() {
 };
 
 Trivster.prototype._handleRoundStart = function() {
+    this._currentRound++;
     this._currentRoundTick = 0;
     this._currentQuestion = this._questionSource.getRandomQuestion();
 
