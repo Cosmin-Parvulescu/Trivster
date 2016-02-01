@@ -1,3 +1,8 @@
+var defaultCfg = {
+    ticksPerRound: 4,
+    secondsPerTick: 10
+};
+
 var Trivster = exports.Trivster = function(questionSource, questionTickCb, hintTickCb) {
     this._questionSource = questionSource;
     this._questionTickCb = questionTickCb;
@@ -5,7 +10,9 @@ var Trivster = exports.Trivster = function(questionSource, questionTickCb, hintT
 
     this._currentRound = 0;
     this._currentRoundTick = 0;
-    this._ticksPerRound = 4;
+
+    this._ticksPerRound = defaultCfg.ticksPerRound;
+    this._secondsPerTick = defaultCfg.secondsPerTick;
 
     this._timer = null;
     this._currentQuestion = null;
@@ -35,7 +42,7 @@ Trivster.prototype._handleRoundStart = function() {
 
         self._hintTickCb(hint);
         self._currentRoundTick = (self._currentRoundTick + 1) % (self._ticksPerRound + 1);
-    }, 10000);
+    }, this._secondsPerTick * 1000);
 };
 
 Trivster.prototype.startGame = function() {
