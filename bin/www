@@ -4,7 +4,7 @@
  * Tha game object
  */
 
-var Game = require('../game');
+var Game = require('../game').Game;
 
 /**
  * Module dependencies.
@@ -32,7 +32,35 @@ var server = http.createServer(app);
  */
 
  var game = new Game();
- game.initServer(server);
+
+ var io = require('socket.io')(server);
+ io.on('connection', function(socket) {
+     socket.on('join', function(room) {
+         socket.join(room, function(err) {
+             if(err) {
+                 socket.emit('error', err);
+             }
+         });
+
+         game.addPlayer({
+            id: socket.client.id
+         }, room);
+
+         socket.room = room;
+
+         var joinMessage = socket.client.id + ' joined the room';
+
+         socket.emit('update', { message: joinMessage });
+         socket.broadcast.to(room).emit('update', { message: joinMessage });
+     });
+
+     socket.on('disconnect', function() {
+         socket.leave(socket.room);
+         socket.broadcast.to(socket.room).emit('update', { message: socket.client.id + ' left the room' });
+
+         game.removePlayer(socket.client.id, socket.room);
+     });
+ });
 
 /**
  * Listen on provided port, on all network interfaces.

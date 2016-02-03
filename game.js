@@ -1,34 +1,36 @@
-var Game = function() {
-    this.io = null;
+var Room = require('./room').Room;
+var QuestionSource = require('./questionSource').QuestionSource;
+var Trivster = require('./trivster').Trivster;
+
+var Game = exports.Game = function() {
+    this.rooms = [];
+    this.questionSource = new QuestionSource();
 };
 
-Game.prototype.initServer = function(server) {
-    this.io = require('socket.io')(server);
-
-    setUpEvents(this.io);
-};
-
-var setUpEvents = function(io) {
-    io.on('connection', function(socket) {
-        socket.on('join', function(room) {
-            socket.join(room, function(err) {
-                if(err) {
-                    socket.emit('error', err);
-                }
-            });
-            socket.room = room;
-
-            var joinMessage = socket.client.id + ' joined the room';
-
-            socket.emit('update', { message: joinMessage });
-            socket.broadcast.to(room).emit('update', { message: joinMessage });
-        });
-
-        socket.on('disconnect', function() {
-            socket.leave(socket.room);
-            socket.broadcast.to(socket.room).emit('update', { message: socket.client.id + ' left the room' });
-        });
+Game.prototype.findRoom = function(roomName) {
+    return this.rooms.find(function(r) {
+        return r.name === roomName;
     });
 };
 
-module.exports = Game;
+Game.prototype.addPlayer = function(player, roomName) {
+    var self = this;
+    var room = this.findRoom(roomName);
+
+    if(!room) {
+        room = new Room();
+        room.setName(roomName);
+
+        self.rooms.push(room);
+    }
+
+    this.findRoom(roomName).addPlayer(player);
+};
+
+Game.prototype.removePlayer = function(playerId, roomName) {
+    var room = this.rooms.find(function(r) {
+        return r.name === roomName;
+    });
+
+    room.removePlayer(playerId);
+};
